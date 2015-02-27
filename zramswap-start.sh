@@ -32,7 +32,7 @@ if [ -n "$PERCENTAGE" ]; then
 fi
 
 # Initialize zram devices, one device per CPU core
-modprobe zram num_devices=$cores
+modprobe zram num_devices=$cores || exit 71
 
 # Assign memory to zram devices, initialize swap and activate
 # Decrementing $core, because cores start counting at 0
