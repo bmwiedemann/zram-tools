@@ -14,9 +14,9 @@ PRIORITY=100   # Swap priority, see swapon(2) for more details
 if [ ! -f /proc/cpuinfo ]; then
     echo "WARNING: Can't find /proc/cpuinfo, is proc mounted?"
     echo "         Using a single core for zramswap..."
-    cores=1
+    CORES=1
 else
-    cores=$(grep -c processor /proc/cpuinfo)
+    CORES=$(grep -c processor /proc/cpuinfo)
 fi
 
 # Override  above from config file, if it exists
@@ -32,12 +32,12 @@ if [ -n "$PERCENTAGE" ]; then
 fi
 
 # Initialize zram devices, one device per CPU core
-modprobe zram num_devices=$cores || exit 71
+modprobe zram num_devices=$CORES || exit 71
 
 # Assign memory to zram devices, initialize swap and activate
 # Decrementing $core, because cores start counting at 0
-for core in $(seq 0 $(($cores - 1))); do
-    echo $(($ALLOCATION / $cores)) > /sys/block/zram$core/disksize
+for core in $(seq 0 $(($CORES - 1))); do
+    echo $(($ALLOCATION / $CORES)) > /sys/block/zram$core/disksize
     mkswap /dev/zram$core
     swapon -p $PRIORITY /dev/zram$core
 done
